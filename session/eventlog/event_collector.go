@@ -5,6 +5,7 @@
 package eventlog
 
 import (
+	"errors"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -70,6 +71,15 @@ func (e *EventLog) Enable(enable bool) *dbus.Error {
 	}
 	e.setPropEnabled(enable)
 	return nil
+}
+
+func (e *EventLog) ReportLog(log string) *dbus.Error {
+	if e.writeEventLogFn != nil {
+		e.writeEventLogFn(log)
+		return nil
+	} else {
+		return dbusutil.ToError(errors.New("record log to local failed"))
+	}
 }
 
 func (e *EventLog) syncUserExpState() {
